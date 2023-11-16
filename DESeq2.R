@@ -2,6 +2,7 @@ setwd()
 
 library(phyloseq)
 library(plyr)
+library(ggplot2)
 
 ###Import datasets
 otus <- read.csv("otu_table.csv", row.names=1)
@@ -30,10 +31,6 @@ TAX
 physeq = phyloseq(OTU, TAX)
 physeq
 
-#combine meta data with physeq object Brazelton method
-# sample_data(physeq) = meta_data
-# physeq
-
 #merge meta data with physeq object, phyloseq method
 physeq1 = merge_phyloseq(physeq, meta_data)
 physeq1
@@ -57,12 +54,6 @@ dim(sigtab)
 summary(res)
 
 ytitle <- expression(paste("Log"[2]*" Fold Change"))
-
-library(ggplot2)
-# theme_set(theme_bw())
-# scale_fill_discrete <- function(palname = "Set2", ...) {
-#   scale_fill_brewer(palette = palname, ...)
-# }
 
 # phylum order
 x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
