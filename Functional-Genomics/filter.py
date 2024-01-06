@@ -1,5 +1,6 @@
 from Bio import SeqIO
 
+##Function to filter sequences
 def filter_sequences_by_length(input_file, output_file, min_length):
     with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
         sequences = SeqIO.parse(infile, "fasta")
@@ -9,9 +10,10 @@ def filter_sequences_by_length(input_file, output_file, min_length):
 
     return count
 
-input_file = '/Users/ebh/Desktop/GO/GSL17-019.fa'  # Replace with the path to your input FASTA file
-output_file = '/Users/ebh/Desktop/GO/Filtered_GSL17_019.fa'  # Replace with the path to your desired output file
-min_length = 200  # Minimum length requirement
+##Load files and define output file
+input_file = '/path/to/file'  
+output_file = '/path/to/file'  
+min_length = 40  # Minimum length requirement
 
 num_sequences_written = filter_sequences_by_length(input_file, output_file, min_length)
 
