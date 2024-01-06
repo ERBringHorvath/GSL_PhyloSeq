@@ -53,7 +53,6 @@ plot_ordination(data_phylo_filt_rar, pcoa_bc, color = "Location") +
 perm <- adonis2(data_otu_filt_rar~Location, data = meta_data, permutations = 9999, method = 'bray')
 
 ###PCoA Plot, calculate median
-
 distmat <- phyloseq::distance(physeq, method = "bray")
 
 pcoa_res <- cmdscale(distmat, eig = T, k = 2)
@@ -85,7 +84,6 @@ p4 <- ggplot(df, aes(x = PC1, y = PC2)) +
 p4
 
 ###PCoA Simple
-
 pc <- pcoa_phyloseq(physeq, c("Location"), method = 'bray',
                     circle = 0.75, colors = c('violet', 'cyan')) + 
   geom_point(size=10, color = "black", alpha=0.5) +
