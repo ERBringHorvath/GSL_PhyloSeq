@@ -6,7 +6,7 @@ library(purrr)
 library(forcats)
 library(ggbreak)
 
-genes_df <- read_csv("GSL17_113_Soil.csv")
+genes_df <- read_csv("genes.csv")
 
 #Define COG categories and broader category groups
 cog_definitions <- c(
@@ -51,7 +51,7 @@ broader_categories <- list(
 get_cog_full_name <- function(cog_code) {
   unlist(str_split(cog_code, "")) %>%
     map_chr(~cog_definitions[.]) %>%
-    paste(collapse = ' | ')
+    paste(collapse = ' | ') ##separate multi-COG assignments with a pipe
 }
 
 ##Function to determine broader category
