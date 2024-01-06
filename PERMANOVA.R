@@ -39,13 +39,3 @@ metadata <- as(sample_data(physeq), "data.frame")
 perm <- adonis2(distance(physeq, method="bray", permutations = 999) ~ Location,
                data = metadata)
 perm
-write.csv(perm, file = "PERMANOVA_bray.csv")
-
-#Euclidean is good for continuous data
-perm.s <- adonis2(distance(physeq, method = "euclidean", permutations = 999) ~ Location,
-                  data = metadata)
-perm.s
-
-###If we wanted to manually select locations to compare
-physeq.subs <- subset_samples(physeq, Location %in% c("BRB", "Marina"))
-
