@@ -35,8 +35,7 @@ png(filename="reverse_plots.png")
 grid.arrange(grobs=reverse_plots)
 dev.off()
 
-######
-run remaining commands with r script:
+#run remaining commands with r script:
 
 nano dada.r
 
@@ -89,10 +88,6 @@ dim(seqtable)
 [1]    8 3373
 
 table(nchar(colnames(seqtable)))
-250  251  252  253  254  255  256  257  261  264  292  293  357  365  377  395
-   9    2  127 2850  331   30    8    1    3    1    1    5    1    1    1    1
- 419
-   1
   
 getN <- function(x) sum(getUniques(x))
 track <- cbind(sapply(ff.dada, getN), sapply(merged, getN), rowSums(seqtable.nochim))
