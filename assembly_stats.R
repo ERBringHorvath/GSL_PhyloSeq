@@ -13,7 +13,7 @@ average_coverage_depth
 ###Calculate N50
 library(data.table)
 
-data <- fread("111_Cov.csv")
+data <- fread("")
 
 ##Ensure Length column is numeric
 data[, Length := as.numeric(Length)]
