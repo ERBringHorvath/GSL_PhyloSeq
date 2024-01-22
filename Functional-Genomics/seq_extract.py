@@ -14,7 +14,7 @@ def extract_sequences_seqio(input_file, output_file, genome_name):
 ##Define input and output files
 input_file = '/path/to/file'
 output_file = '/path/to/file'
-genome_name = 'search_key' ##Define seach key
+genome_name = 'search_key' ##Define seach key, should be unique value in FASTA header
 
 if not extract_sequences_seqio(input_file, output_file, genome_name):
     print(f"No sequences found for genome name {genome_name}")
