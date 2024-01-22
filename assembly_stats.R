@@ -1,5 +1,5 @@
 ###Calculate average coverage depth
-contigs_data <- read.csv("111_Cov.csv")
+contigs_data <- read.csv("")
 
 weighted_coverage <- sum(contigs_data$Coverage * contigs_data$Length)
 
