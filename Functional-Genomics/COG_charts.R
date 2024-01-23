@@ -6,7 +6,12 @@ library(purrr)
 library(forcats)
 library(ggbreak)
 
-genes_df <- read_csv("genes.csv")
+genes_df <- read_csv('')
+
+genes_df <- genes_df %>%
+  mutate(
+    COG_First_Letter = substr(COG_category, 1, 1)
+  )
 
 #Define COG categories and broader category groups
 cog_definitions <- c(
@@ -34,62 +39,89 @@ cog_definitions <- c(
   'P' = 'Inorg ion transp and metab',
   'Q' = 'Sec metabol biosyn, transp and catab',
   'R' = 'General funct pred',
-  'S' = 'Function unknown',
-  '_' = 'Hypothetical',
-  '-' = 'Hypothetical'
+  'S' = 'Function unknown'
 )
 
 broader_categories <- list(
   'Information Storage and Processing' = c('J', 'A', 'K', 'L', 'B'),
   'Cellular Processes and Signaling' = c('D', 'Y', 'V', 'T', 'M', 'N', 'Z', 'W', 'U', 'O'),
   'Metabolism' = c('C', 'G', 'E', 'F', 'H', 'I', 'P', 'Q'),
-  'Poorly Characterized' = c('R', 'S'),
-  'Unknown' = c('Hypothetical', 'Unknown')
+  'Poorly Characterized' = c('R', 'S')
 )
 
-##Function to map individual COG codes to their full names
-get_cog_full_name <- function(cog_code) {
-  unlist(str_split(cog_code, "")) %>%
-    map_chr(~cog_definitions[.]) %>%
-    paste(collapse = ' | ') ##separate multi-COG assignments with a pipe
-}
-
-##Function to determine broader category
 get_broader_category <- function(cog_code) {
   for (category in names(broader_categories)) {
-    if (any(str_detect(cog_code, broader_categories[[category]]))) {
+    if (cog_code %in% broader_categories[[category]]) {
       return(category)
     }
   }
-  return('Unknown')
+  return('Poorly Characterized')
 }
 
-##Apply function to create new columns
+# Apply function to create new columns for broader categories
 genes_df <- genes_df %>%
   mutate(
-    COG_Full_Name = map_chr(COG_category, get_cog_full_name),
     Broad_Category = map_chr(COG_category, get_broader_category)
   )
 
-# Count the occurrences of each combination of broader category and full name
-category_counts <- genes_df %>%
-  count(Broad_Category, COG_Full_Name) %>%
-  arrange(Broad_Category, desc(n))
+# For Figure A: Count the occurrences of each broader category per org
+broad_counts <- genes_df %>%
+  count(org, Broad_Category)
 
-# Create ordered factors for consistent coloring and arranging
-category_counts$Broad_Category <- factor(category_counts$Broad_Category, 
-                                         levels = names(broader_categories))
-
-p <- ggplot(category_counts, aes(x = fct_inorder(COG_Full_Name), y = n, fill = Broad_Category)) +
-  geom_col(show.legend = FALSE) +
-  labs(x = "COG Full Name", y = "Count") +
-  scale_fill_manual(values = c("aquamarine3", "darkmagenta", "turquoise1", "coral2", "seagreen1")) +
+# Plot Figure A
+p1 <- ggplot(broad_counts, aes(x = org, y = n, fill = Broad_Category)) +
+  geom_bar(stat = "identity", position = "stack",
+           color="lightgrey", linewidth=0.25) +
+  scale_fill_manual(values = c('Information Storage and Processing' = 'aquamarine3',
+                               'Cellular Processes and Signaling' = 'darkmagenta',
+                               'Metabolism' = 'turquoise1',
+                               'Poorly Characterized' = 'coral2',
+                               'Unknown' = 'coral2')) +
   theme_minimal() +
-  #scale_y_break(c(250,350), expand=c(0,0)) +
+  labs(y="Gene Count") +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1,
-                               size = 10),
-    axis.text.y = element_text(size=15),
-    axis.title.y = element_text(size=20),
-    axis.title.x = element_text(size=20)) 
-p
+    axis.text.x = element_text(size = 20),
+    axis.text.y = element_text(size = 20),
+    axis.title.y = element_text(size = 35),
+    legend.key.size = unit(1, 'cm'),
+    legend.text = element_text(size = 20),
+    legend.title = element_text(size = 30))
+p1
+
+genes_df <- genes_df %>%
+  mutate(
+    COG_First_Letter = substr(COG_category, 1, 1)
+  )
+
+# Count the occurrences of each COG subcategory per org and include the first letter for coloring
+sub_counts <- genes_df %>%
+  count(org, COG_category, name = "count") %>%
+  mutate(COG_First_Letter = substr(COG_category, 1, 1))
+
+# Define your custom color palette
+my_colors <- c(
+  'J' = '#e6194B', 'A' = '#3cb44b', 'K' = '#ffe119', 'L' = '#0082c8', 
+  'B' = '#f58231', 'M' = '#911eb4', 'Y' = '#46f0f0', 'V' = '#f032e6', 
+  'T' = '#d2f53c', 'D' = '#fabebe', 'N' = '#008080', 'Z' = '#e6beff', 
+  'W' = '#aa6e28', 'U' = '#fffac8', 'O' = '#800000', 'C' = '#aaffc3', 
+  'G' = '#808000', 'E' = '#ffd8b1', 'F' = '#000080', 'H' = '#808080', 
+  'S' = 'turquoise', 'P' = '#000000', 'Q' = '#0A5F38', 'R' = '#4363d8', 
+  'I' = '#fabebe'
+)
+
+# Apply these colors to your plot
+p2 <- ggplot(sub_counts, aes(x = org, y = count, fill = COG_First_Letter)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colors) +
+  theme_minimal() +
+  labs(y="Gene Count") +
+  theme(
+    axis.text.x = element_text(size = 20),
+    axis.text.y = element_text(size = 20),
+    axis.title.y = element_text(size = 35),
+    legend.key.size = unit(1, 'cm'),
+    legend.text = element_text(size = 20),
+    legend.title = element_text(size = 30)
+  )
+
+p2
